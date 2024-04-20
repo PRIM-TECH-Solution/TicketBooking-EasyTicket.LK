@@ -1,43 +1,27 @@
 package com.group18.springboot.models;
 
-import java.util.Collection;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "customers")
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     private String name;
-
-
-
     private String email;
-
     private String password;
+    private String contactNumber; // Added for booking purposes
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "cust_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id") )
-    Set<Role> roles = new HashSet<Role>();
+    // Assuming a customer can have multiple tickets
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Ticket> tickets = new HashSet<>();
 
-
-
+    // Getters and setters
 
     public int getId() {
         return id;
@@ -47,14 +31,6 @@ public class User {
         this.id = id;
     }
 
-    public Set<Role> getRole() {
-        return roles;
-    }
-
-    public void setRole(Role role) {
-        this.roles.add(role);
-    }
-
     public String getName() {
         return name;
     }
@@ -62,7 +38,6 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
-
 
     public String getEmail() {
         return email;
@@ -80,6 +55,25 @@ public class User {
         this.password = password;
     }
 
+    public String getContactNumber() {
+        return contactNumber;
+    }
 
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
 
+    public Set<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(Set<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
+    // Method to add a ticket to the customer
+    public void addTicket(Ticket ticket) {
+        this.tickets.add(ticket);
+        ticket.setCustomer(this);
+    }
 }
